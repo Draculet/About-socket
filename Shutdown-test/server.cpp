@@ -65,8 +65,22 @@ int main(int argc, const char * argv[])
         close(listenfd);
     }
     signal(SIGPIPE, SIG_IGN);
-    shutdown(connfd,SHUT_RD);
- 
+    //shutdown(connfd,SHUT_RD);
+    
+    ssize_t readLen = read(connfd, recvMsg, 10);
+        if (readLen < 0) {
+            printf("璇诲彇澶辫触 errno = %d\n",errno);
+            return -1;
+        }
+        else if (readLen == 0)
+        {
+        	printf("read return 0\n");
+        }
+        else
+        {
+            totalSize += readLen;
+            printf("璇诲彇鎴愬姛 totalSize = %zd\n",totalSize);
+        }
     while (1) {
         ssize_t writeLen = write(connfd, recvMsg, sizeof(recvMsg));
         

@@ -43,11 +43,13 @@ int main(void)
     char sendMsg[200000] = {0};
     unsigned long long totalSize = 0;
     signal(SIGPIPE, SIG_IGN);
-    shutdown(connfd,SHUT_WR);
-    //shutdown(connfd,SHUT_RD);
+    //shutdown(connfd,SHUT_WR);
+    shutdown(connfd,SHUT_RD);
+    int count = 0;
     while (1) {
  
         readLen = read(connfd, sendMsg, 1);
+        count++;
         if (readLen < 0) {
             printf("读取失败 errno = %d\n",errno);
             return -1;
@@ -60,6 +62,20 @@ int main(void)
         sleep(1);
         if (totalSize == 1)
             shutdown(connfd,SHUT_RD);
+       	if (count == 10)
+       	{
+       		shutdown(connfd,SHUT_WR);
+       		ssize_t writeLen = write(connfd, sendMsg, 10);
+        	if (writeLen < 0) {
+            	printf("write return -1 ,errno = %d\n",errno);
+            	close(connfd);
+            return -1;
+        	}
+        	else
+        	{
+            	printf("writeLen:%ld\n",writeLen);
+        	}
+       	}     
             //close(connfd);
     }
 }
